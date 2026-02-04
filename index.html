@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+        <div class="balance-container">
+            <h2>Your Balance</h2>
+            <h1 id="balance">$0.00</h1>
+
+            <div class="summary">
+                <div class="income">
+                    <h3>Income</h3>
+                    <p id="income-amount">$0.00</p>
+                </div>
+
+                <div class="expense">
+                    <h3>Expense</h3>
+                    <p id="expense-amount">$0.00</p>
+                </div>
+            </div>
+
+            
+        </div>
+
+        <div class="main-container">
+            <div class="transaction-container">
+                <h2>Transactions</h2>
+                
+                <!-- Search, Filter, and Sort Controls -->
+                <div class="controls-container">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search transactions..." />
+                    </div>
+                    
+                    <div class="filter-sort-row">
+                        <div class="filter-group">
+                            <label for="category-filter"><i class="fa-solid fa-filter"></i> Category:</label>
+                            <select id="category-filter">
+                                <option value="all">All Categories</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="date-filter"><i class="fa-solid fa-calendar"></i> Date:</label>
+                            <select id="date-filter">
+                                <option value="all">All Time</option>
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="sort-select"><i class="fa-solid fa-sort"></i> Sort:</label>
+                            <select id="sort-select">
+                                <option value="date-desc">Date (Newest First)</option>
+                                <option value="date-asc">Date (Oldest First)</option>
+                                <option value="amount-desc">Amount (High to Low)</option>
+                                <option value="amount-asc">Amount (Low to High)</option>
+                                <option value="name-asc">Name (A-Z)</option>
+                                <option value="name-desc">Name (Z-A)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Custom date range (hidden by default) -->
+                    <div class="custom-date-range" id="custom-date-range" style="display: none;">
+                        <input type="date" id="date-from" />
+                        <span>to</span>
+                        <input type="date" id="date-to" />
+                        <button type="button" id="apply-date-range">Apply</button>
+                    </div>
+                    
+                    <div class="results-info">
+                        <span id="results-count">Showing all transactions</span>
+                        <button type="button" id="clear-filters" style="display: none;">Clear Filters</button>
+                    </div>
+                </div>
+                
+                <ul id="transaction-list">
+                    <!-- TRANSACTIONS WILL BE INSERTED HERE -->
+                </ul>
+            </div>
+            
+            <div class="form-container">
+                <h2>Add Transaction</h2>
+
+                <form action="" id="transaction-form">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <input type="text" id="description" placeholder="Enter description..." required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" placeholder="Enter amount..." required />
+                        <small>Use negative(-) for expenses</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category/Tag (Optional)</label>
+                        <input type="text" id="category" placeholder="e.g., Food, Transport, Bills..." />
+                    </div>
+
+                    <button type="submit" id="submit-btn">Add Transaction</button>
+                    <button type="button" id="cancel-edit-btn" style="display: none;">Cancel Edit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
