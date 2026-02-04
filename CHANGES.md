@@ -77,8 +77,8 @@ This document describes the new features and improvements added to the Expense T
 **Date Filter Options:**
 - **All Time** - Show all transactions (default)
 - **Today** - Only today's transactions
-- **This Week** - Last 7 days
-- **This Month** - Last 30 days
+- **This Week** - Current calendar week (Sunday to Saturday)
+- **This Month** - Current calendar month (1st to last day of month)
 - **Custom Range** - Pick your own start and end dates
 
 **How to use Custom Date Range:**
@@ -341,6 +341,16 @@ Requires:
 
 ---
 
+## Bug Fixes
+
+### Date Filter Behavior (v2.0.1)
+- **Fixed:** "This Week" and "This Month" filters now use calendar-based ranges instead of relative rolling periods
+- **Before:** "This Month" showed last 30 days ending today (excluded future dates in current month)
+- **After:** "This Month" shows entire current calendar month (includes all dates from 1st to last day)
+- **Benefit:** Future-dated transactions within the current month/week are now visible
+
+---
+
 ## Future Improvements (Not Implemented)
 
 Potential features for future versions:
@@ -359,4 +369,4 @@ Potential features for future versions:
 
 **Last Updated:** February 4, 2026
 
-**Version:** 2.0 - Added Search, Filter, and Sort capabilities
+**Version:** 2.0.1 - Fixed calendar-based date filters (This Week/This Month)

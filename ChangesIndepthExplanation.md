@@ -516,14 +516,21 @@ if (currentFilters.dateRange !== "all") {
             return transactionDate.getTime() === today.getTime();
         } 
         else if (currentFilters.dateRange === "week") {
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return transactionDate >= weekAgo && transactionDate <= today;
+            // Calendar-based: Start of current week (Sunday) to end of week (Saturday)
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+            endOfWeek.setHours(23, 59, 59, 999);
+            return transactionDate >= startOfWeek && transactionDate <= endOfWeek;
         } 
         else if (currentFilters.dateRange === "month") {
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return transactionDate >= monthAgo && transactionDate <= today;
+            // Calendar-based: First day to last day of current month
+            const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            firstOfMonth.setHours(0, 0, 0, 0);
+            const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            lastOfMonth.setHours(23, 59, 59, 999);
+            return transactionDate >= firstOfMonth && transactionDate <= lastOfMonth;
         }
         // ... custom range logic
     });
@@ -533,8 +540,13 @@ if (currentFilters.dateRange !== "all") {
 **Key Points:**
 - `.setHours(0, 0, 0, 0)` removes time component
 - `.getTime()` converts to timestamp for comparison
-- "Week" = last 7 days
-- "Month" = last 30 days (approximate)
+- **"Week"** = Current calendar week (Sunday to Saturday)
+  - Uses `.getDay()` to find Sunday (0 = Sunday)
+  - Includes future dates within the same week
+- **"Month"** = Current calendar month (1st to last day)
+  - `new Date(year, month, 1)` = first day of month
+  - `new Date(year, month + 1, 0)` = last day of month (day 0 of next month)
+  - Includes future dates within the same month
 
 #### Custom Date Range
 
@@ -1002,6 +1014,63 @@ categoryFilterEl.value = currentSelection;
 
 ---
 
+## Important Bug Fix: Calendar-Based Date Filters
+
+### The Problem
+**Original Implementation (v2.0):**
+- "This Week" = Last 7 days ending today
+- "This Month" = Last 30 days ending today
+
+**Issue:** Future-dated transactions within the current month/week were hidden because the filter used "today" as the upper bound.
+
+**Example:**
+- Today: February 4, 2026
+- Transaction: February 14, 2026 (future date)
+- Filter "This Month": Showed January 4 - February 4
+- Result: February 14 transaction was **hidden** ❌
+
+### The Solution (v2.0.1)
+
+**Calendar-Based Implementation:**
+
+```javascript
+// THIS WEEK: Sunday to Saturday of current week
+else if (currentFilters.dateRange === "week") {
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay()); // Back to Sunday
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Forward to Saturday
+    endOfWeek.setHours(23, 59, 59, 999);
+    return transactionDate >= startOfWeek && transactionDate <= endOfWeek;
+}
+
+// THIS MONTH: 1st to last day of current month
+else if (currentFilters.dateRange === "month") {
+    const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    lastOfMonth.setHours(23, 59, 59, 999);
+    return transactionDate >= firstOfMonth && transactionDate <= lastOfMonth;
+}
+```
+
+**How `new Date(year, month + 1, 0)` works:**
+- Creates date for "day 0" of next month
+- JavaScript interprets "day 0" as last day of previous month
+- Example: `new Date(2026, 3, 0)` = March 31, 2026 (last day of February)
+
+**Result After Fix:**
+- Today: February 4, 2026
+- Filter "This Month": Shows February 1 - February 28/29
+- Transaction on February 14: Now **visible** ✅
+
+### Benefits
+1. **Predictable behavior** - Matches user expectations of "current month/week"
+2. **Includes future dates** - Plan ahead with upcoming transactions
+3. **Calendar alignment** - Natural monthly/weekly boundaries
+4. **Consistent ranges** - Week always has 7 days, month always has 28-31 days
+
+---
+
 ## Summary of Key Patterns
 
 ### 1. Single Responsibility Functions
@@ -1038,9 +1107,11 @@ filtered = filtered.filter(...)    // Transform copy
 ```javascript
 li.innerHTML = `
     <div class="transaction-info">
-        <span>${transaction.description}</span>
-        ${categoryChip}
-    </div>
+        <span>${transact1  
+**Last Updated:** February 4, 2026  
+**Code Version:** 2.0.1  
+**Code Tested:** ✅ All features working as documented  
+**Bug Fixes:** ✅ Calendar-based date filters imple
 `;
 ```
 

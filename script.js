@@ -148,13 +148,20 @@ if (currentFilters.dateRange !== "all") {
         if (currentFilters.dateRange === "today") {
             return transactionDate.getTime() === today.getTime();
         } else if (currentFilters.dateRange === "week") {
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return transactionDate >= weekAgo && transactionDate <= today;
+            // Calendar-based: Start of current week (Sunday) to end of week (Saturday)
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay()); // Go back to Sunday
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+            endOfWeek.setHours(23, 59, 59, 999);
+            return transactionDate >= startOfWeek && transactionDate <= endOfWeek;
         } else if (currentFilters.dateRange === "month") {
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return transactionDate >= monthAgo && transactionDate <= today;
+            // Calendar-based: First day to last day of current month
+            const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            firstOfMonth.setHours(0, 0, 0, 0);
+            const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            lastOfMonth.setHours(23, 59, 59, 999);
+            return transactionDate >= firstOfMonth && transactionDate <= lastOfMonth;
         } else if (currentFilters.dateRange === "custom") {
             if (currentFilters.customDateFrom && currentFilters.customDateTo) {
                 const fromDate = new Date(currentFilters.customDateFrom);
