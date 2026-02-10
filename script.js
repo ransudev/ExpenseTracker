@@ -15,10 +15,6 @@ const searchInputEl = document.getElementById("search-input");
 const categoryFilterEl = document.getElementById("category-filter");
 const dateFilterEl = document.getElementById("date-filter");
 const sortSelectEl = document.getElementById("sort-select");
-const customDateRangeEl = document.getElementById("custom-date-range");
-const dateFromEl = document.getElementById("date-from");
-const dateToEl = document.getElementById("date-to");
-const applyDateRangeEl = document.getElementById("apply-date-range");
 const resultsCountEl = document.getElementById("results-count");
 const clearFiltersEl = document.getElementById("clear-filters");
 
@@ -31,8 +27,6 @@ let currentFilters = {
     search: "",
     category: "all",
     dateRange: "all",
-    customDateFrom: null,
-    customDateTo: null,
     sort: "date-desc"
 };
 
@@ -48,7 +42,6 @@ searchInputEl.addEventListener("input", handleSearchInput);
 categoryFilterEl.addEventListener("change", handleCategoryFilter);
 dateFilterEl.addEventListener("change", handleDateFilter);
 sortSelectEl.addEventListener("change", handleSortChange);
-applyDateRangeEl.addEventListener("click", applyCustomDateRange);
 clearFiltersEl.addEventListener("click", clearAllFilters);
 
 function addTransaction(e){
@@ -162,14 +155,6 @@ if (currentFilters.dateRange !== "all") {
             const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
             lastOfMonth.setHours(23, 59, 59, 999);
             return transactionDate >= firstOfMonth && transactionDate <= lastOfMonth;
-        } else if (currentFilters.dateRange === "custom") {
-            if (currentFilters.customDateFrom && currentFilters.customDateTo) {
-                const fromDate = new Date(currentFilters.customDateFrom);
-                const toDate = new Date(currentFilters.customDateTo);
-                fromDate.setHours(0, 0, 0, 0);
-                toDate.setHours(23, 59, 59, 999);
-                return transactionDate >= fromDate && transactionDate <= toDate;
-            }
         }
         return true;
     });
@@ -328,17 +313,7 @@ function handleCategoryFilter(e) {
 
 function handleDateFilter(e) {
     currentFilters.dateRange = e.target.value;
-    
-    // Show/hide custom date range inputs
-    if (e.target.value === "custom") {
-        customDateRangeEl.style.display = "flex";
-    } else {
-        customDateRangeEl.style.display = "none";
-        currentFilters.customDateFrom = null;
-        currentFilters.customDateTo = null;
-        updateTransactionList();
-    }
-    
+    updateTransactionList();
     updateClearFiltersButton();
 }
 
@@ -347,33 +322,11 @@ function handleSortChange(e) {
     updateTransactionList();
 }
 
-function applyCustomDateRange() {
-    const fromDate = dateFromEl.value;
-    const toDate = dateToEl.value;
-    
-    if (!fromDate || !toDate) {
-        alert("Please select both start and end dates");
-        return;
-    }
-    
-    if (new Date(fromDate) > new Date(toDate)) {
-        alert("Start date must be before end date");
-        return;
-    }
-    
-    currentFilters.customDateFrom = fromDate;
-    currentFilters.customDateTo = toDate;
-    updateTransactionList();
-    updateClearFiltersButton();
-}
-
 function clearAllFilters() {
     // Reset filters
     currentFilters.search = "";
     currentFilters.category = "all";
     currentFilters.dateRange = "all";
-    currentFilters.customDateFrom = null;
-    currentFilters.customDateTo = null;
     currentFilters.sort = "date-desc";
     
     // Reset UI elements
@@ -381,9 +334,6 @@ function clearAllFilters() {
     categoryFilterEl.value = "all";
     dateFilterEl.value = "all";
     sortSelectEl.value = "date-desc";
-    customDateRangeEl.style.display = "none";
-    dateFromEl.value = "";
-    dateToEl.value = "";
     
     updateTransactionList();
     updateClearFiltersButton();
