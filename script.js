@@ -50,7 +50,8 @@ e.preventDefault();
 const description = descriptionEl.value.trim();
 const amount = parseFloat(amountEl.value);
 const date = dateEl.value;
-const category = categoryEl.value.trim();
+const categoryRaw = categoryEl.value.trim();
+const category = categoryRaw.charAt(0).toUpperCase() + categoryRaw.slice(1);
 
 // Check if we're editing or adding new transaction
 if (editingTransactionId !== null) {
@@ -161,21 +162,32 @@ if (currentFilters.dateRange !== "all") {
 }
 
 // Apply sorting
+// .sort() compares two items (a and b) at a time
+// Return negative number: a comes before b
+// Return positive number: b comes before a
+// Return 0: keep original order
 filtered.sort((a, b) => {
     switch (currentFilters.sort) {
         case "date-desc":
+            // Newest first: Compare b - a (larger date = more recent)
             return new Date(b.date || 0) - new Date(a.date || 0);
         case "date-asc":
+            // Oldest first: Compare a - b (smaller date = older)
             return new Date(a.date || 0) - new Date(b.date || 0);
         case "amount-desc":
+            // Highest amount first: Math.abs() treats -$50 and $50 as same size
             return Math.abs(b.amount) - Math.abs(a.amount);
         case "amount-asc":
+            // Lowest amount first
             return Math.abs(a.amount) - Math.abs(b.amount);
         case "name-asc":
+            // A to Z: localeCompare() returns negative if a < b
             return a.description.localeCompare(b.description);
         case "name-desc":
+            // Z to A: Reverse comparison
             return b.description.localeCompare(a.description);
         default:
+            // Fallback: Sort by newest date
             return new Date(b.date || 0) - new Date(a.date || 0);
     }
 });
